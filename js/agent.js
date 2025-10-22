@@ -1,52 +1,71 @@
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/1hKdD1mH-6_FM35YRqrxfeaLoqn2fmlyKjxJ-TsvwDyY/gviz/tq?tqx=out:csv&gid=1118150853';
+const sheetGIDs = {
+  EgyptCR: '1118150853',
+  EgyptTelesales: '672724919',
+  IRQCR: '1741671021',
+  IRQTelesales: '1989169122',
+  GCC: '1211972237'
+};
+
 let allData = [];
 
+// Format date for sheet
 function formatDateForSheet(dateStr){
     const d = new Date(dateStr);
-    const month = d.getMonth()+1;
-    const day = d.getDate();
-    const year = d.getFullYear();
-    return `${month}/${day}/${year}`;
+    return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 }
 
-// Fetch and parse sheet
-fetch(sheetUrl)
-.then(res=>res.text())
-.then(csv=>{
-    const rows = csv.split('\n').map(r=>r.split(','));
-    const dates = rows[1];
+// Load data for selected country
+function loadData(){
+    const country = document.getElementById('countrySelect').value;
+    const gid = sheetGIDs[country];
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/1hKdD1mH-6_FM35YRqrxfeaLoqn2fmlyKjxJ-TsvwDyY/gviz/tq?tqx=out:csv&gid=${gid}`;
+
+    document.getElementById('list').innerHTML = "Loading data...";
+
+    allData = [];
     const agentIdsSet = new Set();
 
-    for(let i=2;i<rows.length;i++){
-        const taagerId = rows[i][0]?.trim();
-        const teamLeader = rows[i][1]?.trim() || "No TL";
-        const name = rows[i][2]?.trim();
-        if(!taagerId || !name) continue;
+    fetch(sheetUrl)
+    .then(res => res.text())
+    .then(csv => {
+        const rows = csv.split('\n').map(r=>r.split(','));
+        const dates = rows[1];
 
-        const shiftsPerDate = {};
-        for(let j=5;j<rows[i].length;j++){
-            const cellDate = dates[j]?.trim().replace(/\r|\n|"/g,'');
-            if(cellDate) shiftsPerDate[cellDate] = rows[i][j]?.trim();
+        for(let i=2;i<rows.length;i++){
+            const taagerId = rows[i][0]?.trim();
+            const teamLeader = rows[i][1]?.trim() || "No TL";
+            const name = rows[i][2]?.trim();
+            if(!taagerId || !name) continue;
+
+            const shiftsPerDate = {};
+            for(let j=5;j<rows[i].length;j++){
+                const cellDate = dates[j]?.trim().replace(/\r|\n|"/g,'');
+                if(cellDate) shiftsPerDate[cellDate] = rows[i][j]?.trim();
+            }
+
+            allData.push({taagerId, teamLeader, name, shiftsPerDate});
+            agentIdsSet.add(taagerId);
         }
 
-        allData.push({taagerId, teamLeader, name, shiftsPerDate});
-        agentIdsSet.add(taagerId);
-    }
+        // Populate datalist for Agent IDs
+        const datalist = document.getElementById('agentIds');
+        datalist.innerHTML = '';
+        Array.from(agentIdsSet).sort().forEach(id=>{
+            const opt = document.createElement('option');
+            opt.value = id;
+            datalist.appendChild(opt);
+        });
 
-    // Populate datalist for search
-    const datalist = document.getElementById('agentIds');
-    Array.from(agentIdsSet).sort().forEach(id=>{
-        const opt = document.createElement('option');
-        opt.value = id;
-        datalist.appendChild(opt);
+        document.getElementById('list').innerHTML = "Data loaded. Select Agent ID and date range.";
+    })
+    .catch(err=>{
+        document.getElementById('list').innerHTML="Error loading data 😔";
+        console.error(err);
     });
-})
-.catch(err=>{
-    document.getElementById('list').innerHTML="Error loading data 😔";
-    console.error(err);
-});
+}
 
-document.getElementById('searchBtn').addEventListener('click',()=>{
+// Search function
+function searchAgent(){
     const agentId = document.getElementById('agentIdSelect').value.trim();
     const fromDateInput = document.getElementById('fromDate').value;
     const toDateInput = document.getElementById('toDate').value;
@@ -79,7 +98,7 @@ document.getElementById('searchBtn').addEventListener('click',()=>{
         const dateObj = new Date(dateStr);
         if(dateObj>=fromDate && dateObj<=toDate){
             let shiftRaw = d.shiftsPerDate[dateStr] || "";
-            shiftRaw = shiftRaw.replace(/"/g,'').trim(); // إزالة الاقتباسات والمسافات
+            shiftRaw = shiftRaw.replace(/"/g,'').trim();
             const shift = shiftRaw.toLowerCase();
             if(!shift || exclude.includes(shift)) return;
 
@@ -102,4 +121,11 @@ document.getElementById('searchBtn').addEventListener('click',()=>{
     });
     html+=`</table>`;
     document.getElementById('list').innerHTML=html;
-});
+}
+
+// Event listeners
+document.getElementById('countrySelect').addEventListener('change', loadData);
+document.getElementById('searchBtn').addEventListener('click', searchAgent);
+
+// Initial load
+loadData();
