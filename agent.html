@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search by Agent ID</title>
+<link rel="stylesheet" href="css/agent.css">
+</head>
+<body>
+
+<h2>Search by Agent ID</h2>
+
+<div class="filter-container">
+  <label>Agent ID:</label>
+  <input list="agentIds" id="agentIdSelect" placeholder="Type or select ID">
+  <datalist id="agentIds"></datalist>
+
+  <label>From:</label>
+  <input type="date" id="fromDate">
+  <label>To:</label>
+  <input type="date" id="toDate">
+  <button id="searchBtn">Search</button>
+</div>
+
+<div id="list">Type or select Agent ID and date range then click Search.</div>
+
+<script src="js/agent.js"></script>
+
+</body>
+</html>

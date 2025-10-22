@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workers by Date</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Workers by Date</h2>
+
+<div class="filter-container">
+<label for="shiftFilter">Shift Filter:</label>
+<select id="shiftFilter">
+<option value="shift">Shift</option>
+<option value="off">Off</option>
+<option value="annual">Annual</option>
+<option value="no_show">No Show</option>
+<option value="sick">Sick</option>
+<option value="casual">Casual</option>
+</select>
+
+<label for="tlFilter">Team Leader:</label>
+<select id="tlFilter">
+<option value="all">All</option>
+</select>
+
+<label for="dateFilter">Date:</label>
+<input type="date" id="dateFilter">
+<button id="searchBtn">Search</button>
+<a href="agent.html"><button>Search by Agent ID</button></a>
+</div>
+
+<div id="countDisplay">Total: 0</div>
+<div id="list">Loading...</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
