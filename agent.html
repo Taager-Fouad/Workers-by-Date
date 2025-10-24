@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Search by Agent ID</title>
-<link rel="stylesheet" href="css/agent.css">
+
+<!-- Chart.js + Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -31,10 +35,15 @@
 
   <button id="searchBtn">Search</button>
 </div>
+<div id="percentInfo" style="display:none;"></div>
 
-<div id="list">Select country, Agent ID and date range then click Search.</div>
+<div id="resultContainer">
+  <div id="list">Select country, Agent ID and date range then click Search.</div>
+  <div class="chart-container" style="display:none;">
+    <canvas id="shiftChart"></canvas>
+  </div>
+</div>
 
-<script src="js/agent.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>
