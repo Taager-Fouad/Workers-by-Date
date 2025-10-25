@@ -111,3 +111,14 @@ canvas:hover { transform: scale(1.05); }
   .chart-container { width: 100%; height: auto; }
   #resultContainer { flex-direction: column; align-items: center; }
 }
+.version {
+      position: fixed;
+      bottom: 10px;
+      left: 15px;
+      font-size: 16px;
+      user-select: none;
+      font-weight: 500;
+      z-index: 9999;
+      color:#00c8ff;
+      text-shadow:0 0 10px rgba(0,200,255,0.5);
+    }
