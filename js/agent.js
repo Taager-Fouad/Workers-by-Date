@@ -50,6 +50,11 @@ function loadData(){
   });
 }
 
+function getDayName(dateStr){
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { weekday: 'long' }); // Full day name
+}
+
 function searchAgent(){
   const agentId = document.getElementById('agentIdSelect').value.trim();
   const fromDateInput = document.getElementById('fromDate').value;
@@ -90,7 +95,8 @@ function searchAgent(){
       if(!shift || exclude.includes(shift)) return;
       counts.totalDays++;
       if(shiftTypes.includes(shift)) counts[shift]++;
-      details.push({date:dateStr, shift:shiftRaw});
+      const dayName = getDayName(dateStr);
+      details.push({day: dayName, date: dateStr, shift: shiftRaw});
     }
   });
 
@@ -108,9 +114,9 @@ function searchAgent(){
       </p>
     </div>`;
 
-  html+=`<table><tr><th>Date</th><th>Shift</th></tr>`;
+  html+=`<table><tr><th>Day</th><th>Date</th><th>Shift</th></tr>`;
   details.forEach(dt=>{
-    html+=`<tr><td>${dt.date}</td><td>${dt.shift}</td></tr>`;
+    html+=`<tr><td>${dt.day}</td><td>${dt.date}</td><td>${dt.shift}</td></tr>`;
   });
   html+=`</table>`;
   document.getElementById('list').innerHTML=html;
@@ -118,7 +124,15 @@ function searchAgent(){
   const filteredShiftTypes = shiftTypes.filter(s => counts[s] > 0);
   const chartData = filteredShiftTypes.map(s=>counts[s]);
   const chartLabels = filteredShiftTypes.map(s=>s.charAt(0).toUpperCase() + s.slice(1));
-  const chartColors = ['#00c8ff','#ffc107','#ff4d4d','#00ff99','#b366ff'];
+  
+  // neon glow chart colors
+  const chartColors = [
+    'rgba(0,200,255,0.9)',
+    'rgba(255,193,7,0.9)',
+    'rgba(255,77,77,0.9)',
+    'rgba(0,255,153,0.9)',
+    'rgba(179,102,255,0.9)'
+  ];
 
   document.querySelector(".chart-container").style.display = filteredShiftTypes.length ? "flex" : "none";
 
@@ -126,15 +140,24 @@ function searchAgent(){
 
   if(filteredShiftTypes.length){
     const ctx = document.getElementById('shiftChart').getContext('2d');
+    const neonGlow = ctx.createRadialGradient(150,150,50,150,150,300);
+    neonGlow.addColorStop(0, '#00c8ff22');
+    neonGlow.addColorStop(1, '#00c8ff00');
+
     chartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: chartLabels,
         datasets: [{
           data: chartData,
-          backgroundColor: chartColors.slice(0, filteredShiftTypes.length),
-          borderWidth: 0,
-          hoverOffset: 15
+          backgroundColor: chartColors,
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 2,
+          hoverOffset: 18,
+          shadowOffsetX: 2,
+          shadowOffsetY: 2,
+          shadowBlur: 15,
+          shadowColor: 'rgba(0,200,255,0.5)'
         }]
       },
       options: {
@@ -148,8 +171,14 @@ function searchAgent(){
               const percent = total ? ((value / total) * 100).toFixed(1) + '%' : '0%';
               return percent;
             },
-            font: { weight: 'bold', size: 14 }
+            font: { weight: 'bold', size: 14 },
+            textShadowColor: '#000',
+            textShadowBlur: 10
           }
+        },
+        animation: {
+          animateScale: true,
+          animateRotate: true
         }
       },
       plugins: [ChartDataLabels]
