@@ -9,7 +9,7 @@ const sheetGIDs = {
 let allData = [];
 let chartInstance = null;
 
-function loadData(){
+function loadData() {
   const country = document.getElementById('countrySelect').value;
   const gid = sheetGIDs[country];
   const sheetUrl = `https://docs.google.com/spreadsheets/d/1hKdD1mH-6_FM35YRqrxfeaLoqn2fmlyKjxJ-TsvwDyY/gviz/tq?tqx=out:csv&gid=${gid}`;
@@ -20,93 +20,95 @@ function loadData(){
   fetch(sheetUrl)
     .then(res => res.text())
     .then(csv => {
-      const rows = csv.split('\n').map(r=>r.split(','));
+      const rows = csv.split('\n').map(r => r.split(','));
       const dates = rows[1];
-      for(let i=2;i<rows.length;i++){
-        const taagerId = rows[i][0]?.trim();
-        const teamLeader = rows[i][1]?.trim() || "No TL";
-        const name = rows[i][2]?.trim();
-        if(!taagerId || !name) continue;
+      for (let i = 2; i < rows.length; i++) {
+        const taagerId = rows[i][0]?.replace(/"/g,'').trim();
+        const teamLeader = rows[i][1]?.replace(/"/g,'').trim() || "No TL";
+        const name = rows[i][2]?.replace(/"/g,'').trim();
+        if (!taagerId || !name) continue;
         const shiftsPerDate = {};
-        for(let j=5;j<rows[i].length;j++){
-          const cellDate = dates[j]?.trim().replace(/\r|\n|"/g,'');
-          if(cellDate) shiftsPerDate[cellDate] = rows[i][j]?.trim();
+        for (let j = 5; j < rows[i].length; j++) {
+          const cellDate = dates[j]?.trim().replace(/\r|\n|"/g, '');
+          if (cellDate) shiftsPerDate[cellDate] = rows[i][j]?.replace(/"/g,'').trim();
         }
-        allData.push({taagerId, teamLeader, name, shiftsPerDate});
+        allData.push({ taagerId, teamLeader, name, shiftsPerDate });
         agentIdsSet.add(taagerId);
       }
+
       const datalist = document.getElementById('agentIds');
       datalist.innerHTML = '';
-      Array.from(agentIdsSet).sort().forEach(id=>{
+      Array.from(agentIdsSet).sort().forEach(id => {
         const opt = document.createElement('option');
         opt.value = id;
+        opt.textContent = id;
         datalist.appendChild(opt);
       });
+
       document.getElementById('list').innerHTML = "Data loaded. Select Agent ID and date range.";
     })
-    .catch(err=>{
-      document.getElementById('list').innerHTML="Error loading data 😔";
+    .catch(err => {
+      document.getElementById('list').innerHTML = "Error loading data 😔";
       console.error(err);
     });
 }
 
-function getDayName(dateStr){
+function getDayName(dateStr) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('en-US', { weekday: 'long' }); 
+  return d.toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-// لضبط المقارنة بين التواريخ بدون مشاكل وقت
-function formatDateOnly(dateObj){
+function formatDateOnly(dateObj) {
   const y = dateObj.getFullYear();
-  const m = ('0'+(dateObj.getMonth()+1)).slice(-2);
-  const d = ('0'+dateObj.getDate()).slice(-2);
+  const m = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+  const d = ('0' + dateObj.getDate()).slice(-2);
   return `${y}-${m}-${d}`;
 }
 
-function searchAgent(){
+function searchAgent() {
   const agentId = document.getElementById('agentIdSelect').value.trim();
   const fromDateInput = document.getElementById('fromDate').value;
   const toDateInput = document.getElementById('toDate').value;
 
-  if(!agentId || !fromDateInput || !toDateInput){
+  if (!agentId || !fromDateInput || !toDateInput) {
     alert("Please enter Agent ID and date range.");
     return;
   }
 
   const fromDate = new Date(fromDateInput);
   const toDate = new Date(toDateInput);
-  toDate.setHours(23,59,59,999);
+  toDate.setHours(23, 59, 59, 999);
 
-  const exclude=["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
-  const shiftTypes=["off","annual","no show","sick","casual"];
+  const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
+  const shiftTypes = ["off","annual","no show","sick","casual"];
 
   const agentData = allData.filter(d => d.taagerId === agentId);
-  if(agentData.length===0){
-    document.getElementById('list').innerHTML="No data found for this Agent ID.";
-    document.querySelector(".chart-container").style.display="none";
-    document.getElementById("percentInfo").style.display="none";
+  if (agentData.length === 0) {
+    document.getElementById('list').innerHTML = "No data found for this Agent ID.";
+    document.querySelector(".chart-container").style.display = "none";
+    document.getElementById("percentInfo").style.display = "none";
     return;
   }
 
   const d = agentData[0];
   const counts = {};
-  shiftTypes.forEach(s=>counts[s]=0);
+  shiftTypes.forEach(s => counts[s] = 0);
   counts.totalDays = 0;
 
-  const details=[];
+  const details = [];
   const fromOnly = formatDateOnly(fromDate);
   const toOnly = formatDateOnly(toDate);
 
-  Object.keys(d.shiftsPerDate).forEach(dateStr=>{
+  Object.keys(d.shiftsPerDate).forEach(dateStr => {
     const dateOnly = formatDateOnly(new Date(dateStr));
-    if(dateOnly >= fromOnly && dateOnly <= toOnly){
+    if (dateOnly >= fromOnly && dateOnly <= toOnly) {
       let shiftRaw = d.shiftsPerDate[dateStr] || "";
       shiftRaw = shiftRaw.replace(/"/g,'').trim();
       const shift = shiftRaw.toLowerCase();
-      if(!shift || exclude.includes(shift)) return;
+      if (!shift || exclude.includes(shift)) return;
       counts.totalDays++;
-      if(shiftTypes.includes(shift)) counts[shift]++;
-      details.push({day: getDayName(dateStr), date: dateStr, shift: shiftRaw});
+      if (shiftTypes.includes(shift)) counts[shift]++;
+      details.push({ day: getDayName(dateStr), date: dateStr, shift: shiftRaw });
     }
   });
 
@@ -124,17 +126,17 @@ function searchAgent(){
       </p>
     </div>`;
 
-  html+=`<table><tr><th>Day</th><th>Date</th><th>Shift</th></tr>`;
-  details.forEach(dt=>{
-    html+=`<tr><td>${dt.day}</td><td>${dt.date}</td><td>${dt.shift}</td></tr>`;
+  html += `<table><tr><th>Day</th><th>Date</th><th>Shift</th></tr>`;
+  details.forEach(dt => {
+    html += `<tr><td>${dt.day}</td><td>${dt.date}</td><td>${dt.shift}</td></tr>`;
   });
-  html+=`</table>`;
-  document.getElementById('list').innerHTML=html;
+  html += `</table>`;
+  document.getElementById('list').innerHTML = html;
 
   const filteredShiftTypes = shiftTypes.filter(s => counts[s] > 0);
-  const chartData = filteredShiftTypes.map(s=>counts[s]);
-  const chartLabels = filteredShiftTypes.map(s=>s.charAt(0).toUpperCase() + s.slice(1));
-  
+  const chartData = filteredShiftTypes.map(s => counts[s]);
+  const chartLabels = filteredShiftTypes.map(s => s.charAt(0).toUpperCase() + s.slice(1));
+
   const chartColors = [
     'rgba(0,200,255,0.9)',
     'rgba(255,193,7,0.9)',
