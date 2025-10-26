@@ -16,6 +16,7 @@ function loadData() {
   document.getElementById('list').innerHTML = "Loading data...";
   allData = [];
   const agentIdsSet = new Set();
+  const agentNamesSet = new Set();
 
   fetch(sheetUrl)
     .then(res => res.text())
@@ -34,18 +35,19 @@ function loadData() {
         }
         allData.push({ taagerId, teamLeader, name, shiftsPerDate });
         agentIdsSet.add(taagerId);
+        agentNamesSet.add(name);
       }
 
       const datalist = document.getElementById('agentIds');
       datalist.innerHTML = '';
-      Array.from(agentIdsSet).sort().forEach(id => {
+      const combined = [...agentIdsSet, ...agentNamesSet];
+      combined.sort().forEach(val => {
         const opt = document.createElement('option');
-        opt.value = id;
-        opt.textContent = id;
+        opt.value = val;
         datalist.appendChild(opt);
       });
 
-      document.getElementById('list').innerHTML = "Data loaded. Select Agent ID and date range.";
+      document.getElementById('list').innerHTML = "Data loaded. Select Agent ID or Name and date range.";
     })
     .catch(err => {
       document.getElementById('list').innerHTML = "Error loading data 😔";
@@ -66,12 +68,12 @@ function formatDateOnly(dateObj) {
 }
 
 function searchAgent() {
-  const agentId = document.getElementById('agentIdSelect').value.trim();
+  const searchValue = document.getElementById('agentIdSelect').value.trim().toLowerCase();
   const fromDateInput = document.getElementById('fromDate').value;
   const toDateInput = document.getElementById('toDate').value;
 
-  if (!agentId || !fromDateInput || !toDateInput) {
-    alert("Please enter Agent ID and date range.");
+  if (!searchValue || !fromDateInput || !toDateInput) {
+    alert("Please enter Agent ID/Name and date range.");
     return;
   }
 
@@ -82,9 +84,14 @@ function searchAgent() {
   const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
   const shiftTypes = ["off","annual","no show","sick","casual"];
 
-  const agentData = allData.filter(d => d.taagerId === agentId);
+  // 🔍 البحث بالـ ID أو الاسم
+  const agentData = allData.filter(d =>
+    d.taagerId.toLowerCase() === searchValue ||
+    d.name.toLowerCase() === searchValue
+  );
+
   if (agentData.length === 0) {
-    document.getElementById('list').innerHTML = "No data found for this Agent ID.";
+    document.getElementById('list').innerHTML = "No data found for this Agent.";
     document.querySelector(".chart-container").style.display = "none";
     document.getElementById("percentInfo").style.display = "none";
     return;
