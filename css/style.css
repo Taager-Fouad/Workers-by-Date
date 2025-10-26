@@ -4,11 +4,11 @@ body {
 }
 h2 { color:#00c8ff; text-shadow:0 0 10px rgba(0,200,255,0.5); margin-bottom:20px; }
 .filter-container {
-  display:flex; gap:15px; flex-wrap:nowrap; margin-bottom:20px; justify-content:flex-start; width:100%; max-width:1200px;
+  display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; justify-content:center; width:100%;
 }
 label { font-weight:bold; display:flex; align-items:center; }
 
-/* تعديل شكل Select و Date Input و Button */
+/* select + date + button */
 select, input[type="date"], button {
   padding:8px 12px;
   border-radius:12px;
@@ -22,43 +22,34 @@ select, input[type="date"], button {
   appearance: none; -webkit-appearance:none; -moz-appearance:none;
 }
 
-/* hover effect */
 select:hover, input[type="date"]:hover, button:hover {
   transform: scale(1.05);
   border-color: #ff4d4d;
 }
+select option { background:#1e293b; color:#fff; }
 
-/* خيارات الـ select */
-select option {
-  background: #1e293b;
-  color: #fff;
-}
-
-/* زر البحث */
 button {
   border:2px solid #00c8ff;
   background: #0f172a;
   color:#00c8ff;
 }
-button:hover {
-  background:#00c8ff;
-  color:#0f172a;
-}
+button:hover { background:#00c8ff; color:#0f172a; }
 
 #countDisplay { width:83%; text-align:left; margin-bottom:10px; color:#00c8ff; font-weight:bold; }
 #list { overflow-x:auto; width:100%; max-width:1200px; }
 table { width:100%; border-collapse:separate; border-spacing:0; background:rgba(255,255,255,0.05); border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.5); text-align:center; }
-th, td { padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+th, td { padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.2); white-space:nowrap; text-align:center; }
 th { background:rgba(0,200,255,0.3); font-weight:bold; }
 tr:hover { background:rgba(0,200,255,0.2); transition:0.3s; }
+
 .version {
-      position: fixed;
-      bottom: 10px;
-      left: 15px;
-      font-size: 16px;
-      user-select: none;
-      font-weight: 500;
-      z-index: 9999;
-      color:#00c8ff;
-      text-shadow:0 0 10px rgba(0,200,255,0.5);
-    }
+  position: fixed;
+  bottom: 10px;
+  left: 15px;
+  font-size: 16px;
+  user-select: none;
+  font-weight: 500;
+  z-index: 9999;
+  color:#00c8ff;
+  text-shadow:0 0 10px rgba(0,200,255,0.5);
+}
