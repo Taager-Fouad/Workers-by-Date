@@ -10,7 +10,6 @@ function formatDateForSheet(dateStr){
 function loadData(){
   const gid = document.getElementById('sheetSelect').value;
   const sheetUrl = baseUrl + gid;
-
   document.getElementById('list').innerHTML = "Loading...";
   teamLeadersSet.clear();
   allData = [];
@@ -24,14 +23,14 @@ function loadData(){
       document.getElementById('dateFilter').value = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
 
       for(let i=2;i<rows.length;i++){
-        const taagerId = rows[i][0]?.trim();
-        const teamLeaderRaw = rows[i][1]?.trim();
+        const taagerId = rows[i][0]?.replace(/"/g, '').trim();
+        const teamLeaderRaw = rows[i][1]?.replace(/"/g, '').trim();
         const teamLeader = teamLeaderRaw ? teamLeaderRaw : "No TL";
-        const name = rows[i][2]?.trim();
+        const name = rows[i][2]?.replace(/"/g, '').trim();
         const shiftsPerDate = {};
         for(let j=5;j<rows[i].length;j++){
-          const cellDate = dates[j]?.trim().replace(/\r|\n|"/g,'');
-          if(cellDate) shiftsPerDate[cellDate] = rows[i][j]?.trim();
+          const cellDate = dates[j]?.replace(/"/g, '').trim().replace(/\r|\n/g,'');
+          if(cellDate) shiftsPerDate[cellDate] = rows[i][j]?.replace(/"/g, '').trim();
         }
         if(!taagerId || !name) continue;
         allData.push({taagerId, teamLeader, name, shiftsPerDate});
@@ -42,16 +41,22 @@ function loadData(){
       tlSelect.innerHTML = '<option value="all">All</option>';
       Array.from(teamLeadersSet).sort().forEach(tl=>{
         const option = document.createElement('option');
-        option.value = tl; option.textContent = tl; tlSelect.appendChild(option);
+        option.value = tl;
+        option.textContent = tl;
+        tlSelect.appendChild(option);
       });
 
       renderTable();
     })
-    .catch(err => {document.getElementById('list').innerHTML="Error loading data 😔"; console.error(err);});
+    .catch(err => {
+      document.getElementById('list').innerHTML="Error loading data 😔";
+      console.error(err);
+    });
 }
 
 function renderTable(){
   const shiftFilter = document.getElementById('shiftFilter').value;
+  const shiftTimeFilter = document.getElementById('shiftTimeFilter').value;
   const tlFilter = document.getElementById('tlFilter').value;
   const dateInput = document.getElementById('dateFilter').value;
   const selectedDate = formatDateForSheet(dateInput);
@@ -72,6 +77,10 @@ function renderTable(){
       const shiftVal=d.shift.toLowerCase().trim();
       return !["off","annual",...exclude,"no show","sick","casual"].includes(shiftVal);
     });
+    // ✅ فلترة حسب الوقت
+    if(shiftTimeFilter!=="all"){
+      filtered = filtered.filter(d => d.shift.includes(shiftTimeFilter));
+    }
   } else if(["off","annual","no_show","sick","casual"].includes(shiftFilter)){
     const target = shiftMap[shiftFilter] || shiftFilter;
     filtered = filtered.filter(d => d.shift.toLowerCase().trim() === target);
@@ -90,9 +99,22 @@ function renderTable(){
   document.getElementById('list').innerHTML = result || "🎉 No workers to show.";
 }
 
+// ✅ إظهار الفلتر بتاع الشيفت تايم تلقائي عند فتح الصفحة
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('shiftTimeFilter').style.display = "inline-block";
+  document.getElementById('shiftTimeLabel').style.display = "inline-block";
+});
+
+document.getElementById('shiftFilter').addEventListener('change', e=>{
+  const isShift = e.target.value === "shift";
+  document.getElementById('shiftTimeFilter').style.display = isShift ? "inline-block" : "none";
+  document.getElementById('shiftTimeLabel').style.display = isShift ? "inline-block" : "none";
+  renderTable();
+});
+
 document.getElementById('searchBtn').addEventListener('click', renderTable);
-document.getElementById('shiftFilter').addEventListener('change', renderTable);
 document.getElementById('tlFilter').addEventListener('change', renderTable);
+document.getElementById('shiftTimeFilter').addEventListener('change', renderTable);
 document.getElementById('sheetSelect').addEventListener('change', loadData);
 
 loadData();
