@@ -18,9 +18,8 @@ h2 {
   gap:15px;
   flex-wrap:wrap;
   margin-bottom:20px;
-  justify-content:flex-start;
+  justify-content:center;
   width:100%;
-  max-width:1200px;
 }
 label { font-weight:bold; display:flex; align-items:center; }
 select, input[type="date"], input[list], button {
