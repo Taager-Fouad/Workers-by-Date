@@ -203,17 +203,19 @@ function searchAgent() {
       percentDiv.appendChild(box);
     });
 
-    // ✅ إضافة حساب الـ Absent %
+    // ✅ Absent يظهر فقط لو نسبته > 0%
     const absentDays = (counts["no show"]||0) + (counts["sick"]||0) + (counts["casual"]||0);
     const totalEffectiveDays = counts.totalDays - (counts["off"]||0);
     const absentPercent = totalEffectiveDays > 0 ? ((absentDays / totalEffectiveDays) * 100).toFixed(1) : 0;
 
-    const absentBox = document.createElement("div");
-    absentBox.className = "percent-box";
-    absentBox.style.color = "#ff4d4d";
-    absentBox.style.textShadow = "0 0 10px #ff4d4d";
-    absentBox.innerHTML = `Absent: ${absentPercent}%`;
-    percentDiv.appendChild(absentBox);
+    if (absentPercent > 0) {
+      const absentBox = document.createElement("div");
+      absentBox.className = "percent-box";
+      absentBox.style.color = "#ff4d4d";
+      absentBox.style.textShadow = "0 0 10px #ff4d4d";
+      absentBox.innerHTML = `Absent: ${absentPercent}%`;
+      percentDiv.appendChild(absentBox);
+    }
   } else {
     percentDiv.style.display = "none";
   }
