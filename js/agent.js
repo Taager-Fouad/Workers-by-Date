@@ -205,7 +205,7 @@ function searchAgent() {
 
     // ✅ Absent يظهر فقط لو نسبته > 0%
     const absentDays = (counts["no show"]||0) + (counts["sick"]||0) + (counts["casual"]||0);
-    const totalEffectiveDays = counts.totalDays - (counts["off"]||0);
+    const totalEffectiveDays = counts.totalDays - (counts["off"]||0) - (counts["annual"]||0);
     const absentPercent = totalEffectiveDays > 0 ? ((absentDays / totalEffectiveDays) * 100).toFixed(1) : 0;
 
     if (absentPercent > 0) {
