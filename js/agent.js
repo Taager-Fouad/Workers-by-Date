@@ -84,7 +84,6 @@ function searchAgent() {
   const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
   const shiftTypes = ["off","annual","no show","sick","casual"];
 
-  // 🔍 البحث بالـ ID أو الاسم
   const agentData = allData.filter(d =>
     d.taagerId.toLowerCase() === searchValue ||
     d.name.toLowerCase() === searchValue
@@ -203,6 +202,18 @@ function searchAgent() {
       box.innerHTML = `${s.charAt(0).toUpperCase() + s.slice(1)}: ${percent}%`;
       percentDiv.appendChild(box);
     });
+
+    // ✅ إضافة حساب الـ Absent %
+    const absentDays = (counts["no show"]||0) + (counts["sick"]||0) + (counts["casual"]||0);
+    const totalEffectiveDays = counts.totalDays - (counts["off"]||0);
+    const absentPercent = totalEffectiveDays > 0 ? ((absentDays / totalEffectiveDays) * 100).toFixed(1) : 0;
+
+    const absentBox = document.createElement("div");
+    absentBox.className = "percent-box";
+    absentBox.style.color = "#ff4d4d";
+    absentBox.style.textShadow = "0 0 10px #ff4d4d";
+    absentBox.innerHTML = `Absent: ${absentPercent}%`;
+    percentDiv.appendChild(absentBox);
   } else {
     percentDiv.style.display = "none";
   }
