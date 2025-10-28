@@ -1,124 +1,133 @@
 body {
-  background:#0f172a;
-  color:#fff;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-height:100vh;
-  padding:40px;
-}
-h2 {
-  color:#00c8ff;
-  text-shadow:0 0 10px rgba(0,200,255,0.5);
-  margin-bottom:20px;
-}
-.filter-container {
-  display:flex;
-  gap:15px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-  justify-content:center;
-  width:100%;
-}
-label { font-weight:bold; display:flex; align-items:center; }
-select, input[type="date"], input[list], button {
-  padding:8px 12px;
-  border-radius:12px;
-  border:2px solid #00c8ff;
-  background: #1e293b;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.2s;
-  min-width:150px;
-  appearance: none;
-}
-select:hover, input[type="date"]:hover, input[list]:hover, button:hover {
-  transform: scale(1.05);
-  border-color: #ff4d4d;
-}
-select option { background: #1e293b; color: #fff; }
-button {
-  border:2px solid #00c8ff;
-  background: #0f172a;
-  color:#00c8ff;
-}
-button:hover { background:#00c8ff; color:#0f172a; }
-#resultContainer {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 1200px;
-  flex-wrap: wrap;
-}
-table {
-  width: 600px;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  text-align: center;
-}
-th, td {
-  padding:12px 8px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
-th { background:rgba(0,200,255,0.2); font-weight:bold; }
-tr:hover { background:rgba(0,200,255,0.15); transition:0.3s; }
-.chart-container {
-  width: 350px;
-  height: 350px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 25px rgba(0,200,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  margin-top: 11%;
-  animation: fadeIn 0.8s ease-in-out;
-}
-canvas { transition: transform 0.3s ease; }
-canvas:hover { transform: scale(1.05); }
-#percentInfo {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  font-weight: bold;
-}
-.percent-box {
-  padding: 8px 16px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,200,255,0.6);
-  transition: transform 0.3s;
-}
-.percent-box:hover { transform: scale(1.1); }
-@keyframes fadeIn {
-  from {opacity: 0; transform: scale(0.9);}
-  to {opacity: 1; transform: scale(1);}
-}
-@media (max-width: 768px) {
-  table { width: 100%; }
-  .chart-container { width: 100%; height: auto; }
-  #resultContainer { flex-direction: column; align-items: center; }
-}
+    background:#0f172a;
+    color:#fff;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+    padding:40px;
+  }
+  h2 {
+    color:#00c8ff;
+    text-shadow:0 0 10px rgba(0,200,255,0.5);
+    margin-bottom:20px;
+  }
+  .filter-container {
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+    justify-content:center;
+    width:100%;
+  }
+  label { font-weight:bold; display:flex; align-items:center; }
+  select, input[type="date"], input[list], button {
+    padding:8px 12px;
+    border-radius:12px;
+    border:2px solid #00c8ff;
+    background: #1e293b;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+    min-width:150px;
+    appearance: none;
+  }
+  select:hover, input[type="date"]:hover, input[list]:hover, button:hover {
+    transform: scale(1.05);
+    border-color: #ff4d4d;
+  }
+  select option { background: #1e293b; color: #fff; }
+  button {
+    border:2px solid #00c8ff;
+    background: #0f172a;
+    color:#00c8ff;
+  }
+  button:hover { background:#00c8ff; color:#0f172a; }
+  #resultContainer {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    flex-wrap: wrap;
+  }
+  table {
+    width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+  th, td {
+    padding:12px 8px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+  }
+  th { background:rgba(0,200,255,0.2); font-weight:bold; }
+  tr:hover { background:rgba(0,200,255,0.15); transition:0.3s; }
+  .chart-container {
+    width: 350px;
+    height: 350px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 25px rgba(0,200,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-top: 11%;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  canvas { transition: transform 0.3s ease; }
+  canvas:hover { transform: scale(1.05); }
+  #percentInfo {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .percent-box {
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,200,255,0.6);
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s, color 0.3s, text-shadow 0.3s;
+  }
+  .percent-box:hover { transform: scale(1.1); }
 
-.version {
-  position: fixed;
-  bottom: 10px;
-  left: 15px;
-  font-size: 16px;
-  user-select: none;
-  font-weight: 500;
-  z-index: 9999;
-  color:#00c8ff;
-  text-shadow:0 0 10px rgba(0,200,255,0.5);
-}
+  /* ✅ فقط أضفنا الـ active class للـ percent-box */
+  .percent-box.active {
+    color: #fff !important;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff;
+    box-shadow: 0 0 20px currentColor, inset 0 0 10px #fff;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.9);}
+    to {opacity: 1; transform: scale(1);}
+  }
+  @media (max-width: 768px) {
+    table { width: 100%; }
+    .chart-container { width: 100%; height: auto; }
+    #resultContainer { flex-direction: column; align-items: center; }
+  }
+
+  .version {
+    position: fixed;
+    bottom: 10px;
+    left: 15px;
+    font-size: 16px;
+    user-select: none;
+    font-weight: 500;
+    z-index: 9999;
+    color:#00c8ff;
+    text-shadow:0 0 10px rgba(0,200,255,0.5);
+  }
