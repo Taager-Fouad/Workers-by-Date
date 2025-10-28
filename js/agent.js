@@ -82,7 +82,7 @@ function searchAgent() {
   toDate.setHours(23, 59, 59, 999);
 
   const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
-  const shiftTypes = ["off","annual","no show","sick","casual"];
+  const shiftTypes = ["off","annual","no show","sick","casual","public holiday"];
 
   const agentData = allData.filter(d =>
     d.taagerId.toLowerCase() === searchValue ||
@@ -112,23 +112,26 @@ function searchAgent() {
       shiftRaw = shiftRaw.replace(/"/g,'').trim();
       const shift = shiftRaw.toLowerCase();
       if (!shift || exclude.includes(shift)) return;
+
       counts.totalDays++;
       if (shiftTypes.includes(shift)) counts[shift]++;
       details.push({ day: getDayName(dateStr), date: dateStr, shift: shiftRaw });
     }
   });
 
+  // ✅ Summary فوق الجدول
   let html = `
     <div>
       <h3 style="color:#00c8ff;">Agent ID: ${d.taagerId}</h3>
       <p>Name: ${d.name} | Team Leader: ${d.teamLeader}</p>
       <p>
-        Total Days: ${counts.totalDays}
-        ${counts.off ? ` | Off: ${counts.off}` : ""}
-        ${counts.annual ? ` | Annual: ${counts.annual}` : ""}
-        ${counts["sick"] ? ` | Sick: ${counts["sick"]}` : ""}
-        ${counts["no show"] ? ` | No Show: ${counts["no show"]}` : ""}
-        ${counts.casual ? ` | Casual: ${counts.casual}` : ""}
+        Total Days: ${counts.totalDays} 
+        | Off: ${counts.off} 
+        | Annual: ${counts.annual} 
+        | No Show: ${counts["no show"]} 
+        | Sick: ${counts.sick} 
+        | Casual: ${counts.casual} 
+        | Public Holiday: ${counts["public holiday"]}
       </p>
     </div>`;
 
@@ -142,13 +145,13 @@ function searchAgent() {
   const filteredShiftTypes = shiftTypes.filter(s => counts[s] > 0);
   const chartData = filteredShiftTypes.map(s => counts[s]);
   const chartLabels = filteredShiftTypes.map(s => s.charAt(0).toUpperCase() + s.slice(1));
-
   const chartColors = [
     'rgba(0,200,255,0.9)',
     'rgba(255,193,7,0.9)',
     'rgba(255,77,77,0.9)',
     'rgba(0,255,153,0.9)',
-    'rgba(179,102,255,0.9)'
+    'rgba(179,102,255,0.9)',
+    'rgba(255,153,255,0.9)'
   ];
 
   document.querySelector(".chart-container").style.display = filteredShiftTypes.length ? "flex" : "none";
@@ -188,8 +191,11 @@ function searchAgent() {
     });
   }
 
+  // ✅ أزرار percent-box + Absent
   const percentDiv = document.getElementById("percentInfo");
   percentDiv.innerHTML = "";
+  const activeShifts = new Set();
+
   if(filteredShiftTypes.length){
     percentDiv.style.display = "flex";
     filteredShiftTypes.forEach((s,i)=>{
@@ -200,12 +206,37 @@ function searchAgent() {
       box.style.color = chartColors[i];
       box.style.textShadow = `0 0 10px ${chartColors[i]}`;
       box.innerHTML = `${s.charAt(0).toUpperCase() + s.slice(1)}: ${percent}%`;
+
+      box.addEventListener('click', ()=>{
+        if(box.classList.contains('active')){
+          box.classList.remove('active');
+          box.style.background = "none";
+          box.style.color = chartColors[i];
+          box.style.textShadow = `0 0 10px ${chartColors[i]}`;
+        } else {
+          box.classList.add('active');
+          box.style.background = chartColors[i];
+          box.style.color = "#fff";
+          box.style.textShadow = "0 0 10px #fff, 0 0 20px #fff";
+        }
+
+        if(activeShifts.has(s)) activeShifts.delete(s);
+        else activeShifts.add(s);
+
+        const tableRows = document.querySelectorAll("#list table tr");
+        tableRows.forEach((row, idx)=>{
+          if(idx===0) return;
+          const shiftCell = row.cells[2].innerText.toLowerCase();
+          row.style.display = (activeShifts.size===0 || activeShifts.has(shiftCell)) ? "" : "none";
+        });
+      });
+
       percentDiv.appendChild(box);
     });
 
-    // ✅ Absent يظهر فقط لو نسبته > 0%
-    const absentDays = (counts["no show"]||0) + (counts["sick"]||0) + (counts["casual"]||0);
-    const totalEffectiveDays = counts.totalDays - (counts["off"]||0) - (counts["annual"]||0);
+    // ✅ زرار Absent زي الباقي
+    const absentDays = (counts["no show"] || 0) + (counts["sick"] || 0) + (counts["casual"] || 0);
+    const totalEffectiveDays = counts.totalDays - (counts["off"] || 0) - (counts["annual"] || 0) - (counts["public holiday"] || 0);
     const absentPercent = totalEffectiveDays > 0 ? ((absentDays / totalEffectiveDays) * 100).toFixed(1) : 0;
 
     if (absentPercent > 0) {
@@ -214,8 +245,34 @@ function searchAgent() {
       absentBox.style.color = "#ff4d4d";
       absentBox.style.textShadow = "0 0 10px #ff4d4d";
       absentBox.innerHTML = `Absent: ${absentPercent}%`;
+
+      absentBox.addEventListener('click', () => {
+        const relatedShifts = ["no show", "sick", "casual"];
+        if (absentBox.classList.contains('active')) {
+          absentBox.classList.remove('active');
+          absentBox.style.background = "none";
+          absentBox.style.color = "#ff4d4d";
+          absentBox.style.textShadow = "0 0 10px #ff4d4d";
+          relatedShifts.forEach(s => activeShifts.delete(s));
+        } else {
+          absentBox.classList.add('active');
+          absentBox.style.background = "#ff4d4d";
+          absentBox.style.color = "#fff";
+          absentBox.style.textShadow = "0 0 10px #fff, 0 0 20px #fff";
+          relatedShifts.forEach(s => activeShifts.add(s));
+        }
+
+        const tableRows = document.querySelectorAll("#list table tr");
+        tableRows.forEach((row, idx) => {
+          if (idx === 0) return;
+          const shiftCell = row.cells[2].innerText.toLowerCase();
+          row.style.display = (activeShifts.size === 0 || activeShifts.has(shiftCell)) ? "" : "none";
+        });
+      });
+
       percentDiv.appendChild(absentBox);
     }
+
   } else {
     percentDiv.style.display = "none";
   }
