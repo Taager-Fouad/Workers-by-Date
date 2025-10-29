@@ -12,6 +12,7 @@
 
 <h2>Workers by Date</h2>
 
+<!-- صف الفلترز -->
 <div class="filter-container">
   <label for="sheetSelect">Sheet:</label>
   <select id="sheetSelect">
@@ -44,30 +45,24 @@
   </select>
 
   <label for="tlFilter">Team Leader:</label>
-  <select id="tlFilter">
-    <option value="all">All</option>
-  </select>
+  <select id="tlFilter"><option value="all">All</option></select>
 
   <label for="dateFilter">Date:</label>
   <input type="date" id="dateFilter">
 
   <button id="searchBtn">Search</button>
+</div>
 
-  <button id="captureBtn" class="captureExcelBtn">
-    Screenshot
-  </button>
-
-  <button id="excelBtn" class="captureExcelBtn">
-    Excel
-  </button>
-
+<!-- صف الزرارز -->
+<div class="button-row">
+  <button id="captureBtn">Screenshot</button>
+  <button id="excelBtn" >Excel</button>
   <a href="agent.html"><button>Search by Agent ID</button></a>
 </div>
 
 <div id="countDisplay">Total: 0</div>
 <div id="list">Loading...</div>
-
-<div class="version">v0.1.4</div>
+<div class="version">v0.1.6</div>
 <script src="js/script.js"></script>
 </body>
 </html>
