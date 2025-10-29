@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Workers by Date</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -11,7 +13,6 @@
 <h2>Workers by Date</h2>
 
 <div class="filter-container">
-
   <label for="sheetSelect">Sheet:</label>
   <select id="sheetSelect">
     <option value="1118150853" selected>Egypt CR</option>
@@ -31,7 +32,6 @@
     <option value="casual">Casual</option>
   </select>
 
-  <!-- ✅ الفلتر الجديد -->
   <label for="shiftTimeFilter" id="shiftTimeLabel">Shift Time:</label>
   <select id="shiftTimeFilter">
     <option value="all">All</option>
@@ -52,13 +52,22 @@
   <input type="date" id="dateFilter">
 
   <button id="searchBtn">Search</button>
+
+  <button id="captureBtn" class="captureExcelBtn">
+    Screenshot
+  </button>
+
+  <button id="excelBtn" class="captureExcelBtn">
+    Excel
+  </button>
+
   <a href="agent.html"><button>Search by Agent ID</button></a>
 </div>
 
 <div id="countDisplay">Total: 0</div>
 <div id="list">Loading...</div>
 
-<div class="version">v0.1.1</div>
+<div class="version">v0.1.4</div>
 <script src="js/script.js"></script>
 </body>
 </html>
