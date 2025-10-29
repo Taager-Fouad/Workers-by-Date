@@ -77,7 +77,6 @@ function renderTable(){
       const shiftVal=d.shift.toLowerCase().trim();
       return !["off","annual",...exclude,"no show","sick","casual"].includes(shiftVal);
     });
-    // ✅ فلترة حسب الوقت
     if(shiftTimeFilter!=="all"){
       filtered = filtered.filter(d => d.shift.includes(shiftTimeFilter));
     }
@@ -99,7 +98,75 @@ function renderTable(){
   document.getElementById('list').innerHTML = result || "🎉 No workers to show.";
 }
 
-// ✅ إظهار الفلتر بتاع الشيفت تايم تلقائي عند فتح الصفحة
+// ✅ Screenshot
+document.getElementById("captureBtn").addEventListener("click", async () => {
+  const tableArea = document.querySelector("#list");
+  await html2canvas(tableArea, {
+    backgroundColor: null,
+    scale: 2,
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "table-screenshot.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+});
+
+// ✅ Excel
+document.getElementById("excelBtn").addEventListener("click", () => {
+  const shiftFilter = document.getElementById('shiftFilter').value;
+  const shiftTimeFilter = document.getElementById('shiftTimeFilter').value;
+  const tlFilter = document.getElementById('tlFilter').value;
+  const dateInput = document.getElementById('dateFilter').value;
+  const selectedDate = formatDateForSheet(dateInput);
+
+  const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
+
+  let filtered = allData.map(d=>{
+    const shift = (d.shiftsPerDate[selectedDate] || "").replace(/"/g,'').trim();
+    return {...d, shift};
+  }).filter(d=>{
+    if(!d.shift) return false;
+    return !exclude.includes(d.shift.toLowerCase().trim());
+  });
+
+  const shiftMap = {no_show:"no show", sick:"sick", casual:"casual"};
+  if(shiftFilter==="shift"){
+    filtered = filtered.filter(d=>{
+      const shiftVal=d.shift.toLowerCase().trim();
+      return !["off","annual",...exclude,"no show","sick","casual"].includes(shiftVal);
+    });
+    if(shiftTimeFilter!=="all"){
+      filtered = filtered.filter(d => d.shift.includes(shiftTimeFilter));
+    }
+  } else if(["off","annual","no_show","sick","casual"].includes(shiftFilter)){
+    const target = shiftMap[shiftFilter] || shiftFilter;
+    filtered = filtered.filter(d => d.shift.toLowerCase().trim() === target);
+  }
+
+  if(tlFilter!=="all"){
+    filtered = filtered.filter(d => d.teamLeader.trim().toLowerCase() === tlFilter.trim().toLowerCase());
+  }
+
+  if(filtered.length === 0){
+    alert("No data to export!");
+    return;
+  }
+
+  const dataForExcel = filtered.map(d => ({
+    "Taager ID": d.taagerId,
+    "Team Leader": d.teamLeader,
+    "Name": d.name,
+    "Shift": d.shift
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(dataForExcel);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Shifts");
+  XLSX.writeFile(wb, "shift_table.xlsx");
+});
+
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById('shiftTimeFilter').style.display = "inline-block";
   document.getElementById('shiftTimeLabel').style.display = "inline-block";
@@ -111,7 +178,6 @@ document.getElementById('shiftFilter').addEventListener('change', e=>{
   document.getElementById('shiftTimeLabel').style.display = isShift ? "inline-block" : "none";
   renderTable();
 });
-
 document.getElementById('searchBtn').addEventListener('click', renderTable);
 document.getElementById('tlFilter').addEventListener('change', renderTable);
 document.getElementById('shiftTimeFilter').addEventListener('change', renderTable);
