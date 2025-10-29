@@ -90,7 +90,7 @@ function renderTable(){
   }
 
   document.getElementById('countDisplay').textContent = `Total: ${filtered.length}`;
-  let result = "<table><tr><th>Taager ID</th><th>Team Leader</th><th>Name</th><th>Shift</th></tr>";
+  let result = "<table id='tableData'><tr><th>Taager ID</th><th>Team Leader</th><th>Name</th><th>Shift</th></tr>";
   filtered.forEach(d=>{
     result += `<tr><td>${d.taagerId}</td><td>${d.teamLeader}</td><td>${d.name}</td><td>${d.shift}</td></tr>`;
   });
@@ -98,84 +98,51 @@ function renderTable(){
   document.getElementById('list').innerHTML = result || "🎉 No workers to show.";
 }
 
-// ✅ Screenshot
+// Screenshot كامل الجدول + لون مظبوط
 document.getElementById("captureBtn").addEventListener("click", async () => {
   const tableArea = document.querySelector("#list");
-  await html2canvas(tableArea, {
-    backgroundColor: null,
+  const scrollHeight = tableArea.scrollHeight;
+  const scrollWidth = tableArea.scrollWidth;
+
+  const clone = tableArea.cloneNode(true);
+  clone.style.width = scrollWidth + "px";
+  clone.style.backgroundColor = "#0f172a";
+  document.body.appendChild(clone);
+
+  await html2canvas(clone, {
+    backgroundColor: "#0f172a",
     scale: 2,
-    useCORS: true
+    useCORS: true,
+    width: scrollWidth,
+    height: scrollHeight
   }).then(canvas => {
     const link = document.createElement("a");
     link.download = "table-screenshot.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   });
+
+  document.body.removeChild(clone);
 });
 
-// ✅ Excel
+// Excel
 document.getElementById("excelBtn").addEventListener("click", () => {
-  const shiftFilter = document.getElementById('shiftFilter').value;
-  const shiftTimeFilter = document.getElementById('shiftTimeFilter').value;
-  const tlFilter = document.getElementById('tlFilter').value;
-  const dateInput = document.getElementById('dateFilter').value;
-  const selectedDate = formatDateForSheet(dateInput);
-
-  const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales"];
-
-  let filtered = allData.map(d=>{
-    const shift = (d.shiftsPerDate[selectedDate] || "").replace(/"/g,'').trim();
-    return {...d, shift};
-  }).filter(d=>{
-    if(!d.shift) return false;
-    return !exclude.includes(d.shift.toLowerCase().trim());
-  });
-
-  const shiftMap = {no_show:"no show", sick:"sick", casual:"casual"};
-  if(shiftFilter==="shift"){
-    filtered = filtered.filter(d=>{
-      const shiftVal=d.shift.toLowerCase().trim();
-      return !["off","annual",...exclude,"no show","sick","casual"].includes(shiftVal);
-    });
-    if(shiftTimeFilter!=="all"){
-      filtered = filtered.filter(d => d.shift.includes(shiftTimeFilter));
-    }
-  } else if(["off","annual","no_show","sick","casual"].includes(shiftFilter)){
-    const target = shiftMap[shiftFilter] || shiftFilter;
-    filtered = filtered.filter(d => d.shift.toLowerCase().trim() === target);
-  }
-
-  if(tlFilter!=="all"){
-    filtered = filtered.filter(d => d.teamLeader.trim().toLowerCase() === tlFilter.trim().toLowerCase());
-  }
-
-  if(filtered.length === 0){
+  const table = document.querySelector("#tableData");
+  if(!table){
     alert("No data to export!");
     return;
   }
-
-  const dataForExcel = filtered.map(d => ({
-    "Taager ID": d.taagerId,
-    "Team Leader": d.teamLeader,
-    "Name": d.name,
-    "Shift": d.shift
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(dataForExcel);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Shifts");
+  const wb = XLSX.utils.table_to_book(table, {sheet:"Shifts"});
   XLSX.writeFile(wb, "shift_table.xlsx");
 });
 
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById('shiftTimeFilter').style.display = "inline-block";
-  document.getElementById('shiftTimeLabel').style.display = "inline-block";
 });
 
 document.getElementById('shiftFilter').addEventListener('change', e=>{
   const isShift = e.target.value === "shift";
   document.getElementById('shiftTimeFilter').style.display = isShift ? "inline-block" : "none";
-  document.getElementById('shiftTimeLabel').style.display = isShift ? "inline-block" : "none";
   renderTable();
 });
 document.getElementById('searchBtn').addEventListener('click', renderTable);
