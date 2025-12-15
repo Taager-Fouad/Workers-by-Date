@@ -61,7 +61,7 @@ function renderTable(){
   const dateInput = document.getElementById('dateFilter').value;
   const selectedDate = formatDateForSheet(dateInput);
 
-  const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales","tele egy","iraq cr","iraq","eg ts","validation team","#n/a","tele iraq","egy","tele","sus"];
+  const exclude = ["resigned","dismissed","upl","ksa","gcc","whatsapp","tele ksa","tele-sales iraq","tele-sales","tele egy","iraq cr","iraq","eg ts","validation team","#n/a","tele iraq","egy","tele","sus","termination"];
 
   let filtered = allData.map(d=>{
     const shift = (d.shiftsPerDate[selectedDate] || "").replace(/"/g,'').trim();
