@@ -1,6 +1,6 @@
 let allData = [];
 let teamLeadersSet = new Set();
-const baseUrl = 'https://docs.google.com/spreadsheets/d/1hKdD1mH-6_FM35YRqrxfeaLoqn2fmlyKjxJ-TsvwDyY/gviz/tq?tqx=out:csv&gid=';
+const baseUrl = 'https://docs.google.com/spreadsheets/d/1BIiPjpMrcr2JDRz3zUWVcormBui-Ly91slYPAfMnHJY/gviz/tq?tqx=out:csv&gid=';
 
 function formatDateForSheet(dateStr){
   const d = new Date(dateStr);
@@ -23,10 +23,10 @@ function loadData(){
       document.getElementById('dateFilter').value = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
 
       for(let i=2;i<rows.length;i++){
-        const taagerId = rows[i][0]?.replace(/"/g, '').trim();
-        const teamLeaderRaw = rows[i][1]?.replace(/"/g, '').trim();
+        const taagerId = rows[i][2]?.replace(/"/g, '').trim();
+        const teamLeaderRaw = rows[i][0]?.replace(/"/g, '').trim();
         const teamLeader = teamLeaderRaw ? teamLeaderRaw : "No TL";
-        const name = rows[i][2]?.replace(/"/g, '').trim();
+        const name = rows[i][1]?.replace(/"/g, '').trim();
         const shiftsPerDate = {};
         for(let j=5;j<rows[i].length;j++){
           const cellDate = dates[j]?.replace(/"/g, '').trim().replace(/\r|\n/g,'');
